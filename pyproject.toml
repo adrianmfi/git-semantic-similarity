@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "git-semantic-similarity"
+version = "1.0.0"
+description = "file: README.md"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "InstructorEmbedding==1.0.1",
+    "sentence_transformers>=2.2.0",
+    "GitPython>=3.1.40",
+    "numpy",
+    "tqdm",
+]
+[project.license]
+file = "LICENSE"
+
+[project.scripts]
+git-semsim = "cli:main"
