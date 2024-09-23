@@ -8,7 +8,7 @@ import numpy as np
 from git import Commit, Repo
 from git.exc import InvalidGitRepositoryError
 
-from src.embeddings import embed_commit, embed_query, load_model
+from src.embeddings import EmbeddingsCache, embed_commit, embed_query, load_model
 
 
 class CommitData(TypedDict):
@@ -52,20 +52,20 @@ def sanitize_filename(filename):
     type=click.Choice(["sentence-transformers/all-MiniLM-L6-v2"]),
     default="sentence-transformers/all-MiniLM-L6-v2",
     show_default=True,
-    help="Model to use.",
+    help="A sentence-transformers model to use for embeddings.",
 )
 @click.option(
     "-s",
-    "--save",
+    "--cache",
     type=bool,
     default=True,
     show_default=True,
-    help="Save commit embeddings.",
+    help="Cache commit embeddings on disk for faster retrieval.",
 )
 @click.option(
-    "--save-path",
+    "--cache-dir",
     type=click.Path(),
-    help="Path to save embeddings (default: git_root/.git_semsim/model_name).",
+    help="Directory to store cached embeddings (default: git_root/.git_semsim/model_name).",
 )
 @click.option(
     "--oneline",
@@ -77,7 +77,7 @@ def sanitize_filename(filename):
     type=bool,
     default=True,
     show_default=True,
-    help="Sort order for similarity scores.",
+    help="Sort results by similarity score.",
 )
 @click.option(
     "-n",
@@ -88,7 +88,7 @@ def sanitize_filename(filename):
 )
 @click.argument("query")
 @click.argument("git_args", nargs=-1, type=click.UNPROCESSED)
-def main(query, model, save, save_path, oneline, sort, max_count, git_args):
+def main(query, model, cache, cache_dir, oneline, sort, max_count, git_args):
     """
     Give a similarity score for each commit based on semantic similarity using an NLP embedding model.
 
@@ -110,17 +110,18 @@ def main(query, model, save, save_path, oneline, sort, max_count, git_args):
         query_embedding = embed_query(model_instance, query)
 
         # Determine the save path
-        if not save_path:
-            save_path = os.path.join(
-                repo.working_tree_dir, ".git_semsim", sanitize_filename(model)
-            )
-        if save:
-            os.makedirs(save_path, exist_ok=True)
+        if cache:
+            if not cache_dir:
+                cache_dir = os.path.join(
+                    repo.working_tree_dir, ".git_semsim", sanitize_filename(model)
+                )
+            os.makedirs(cache_dir, exist_ok=True)
+            cache_obj = EmbeddingsCache(cache_dir)
 
         results: List[CommitData] = []
 
         for commit in commits:
-            commit_embedding = embed_commit(model_instance, commit, save, save_path)
+            commit_embedding = embed_commit(model_instance, commit, cache_obj)
             similarity = float(np.dot(commit_embedding, query_embedding))
             results.append({"commit": commit, "similarity": similarity})
 
