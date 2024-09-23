@@ -53,7 +53,7 @@ def sanitize_filename(filename):
     type=str,
     default="sentence-transformers/all-MiniLM-L6-v2",
     show_default=True,
-    help="A sentence-transformers model to use for embeddings.",
+    help="A sentence-transformers model to use for embeddings (for example, a slower but stronger model: sentence-transformers/all-mpnet-base-v2).",
 )
 @click.option(
     "-s",
