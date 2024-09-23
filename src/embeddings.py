@@ -10,7 +10,7 @@ def embed_query(model, text: str):
 
 
 def embed_commit(model, commit: Commit, save: bool, save_dir: str | None):
-    embedding_path = os.path.join(save_dir, str(commit["hexsha"]))
+    embedding_path = os.path.join(save_dir, str(commit.hexsha))
     try:
         with open(embedding_path, "rb") as f:
             return np.load(f)
@@ -18,7 +18,7 @@ def embed_commit(model, commit: Commit, save: bool, save_dir: str | None):
         # missing embedding
         pass
 
-    embeddings = model.encode([commit["message"]])[0]
+    embeddings = model.encode([commit.message])[0]
 
     if save:
         with open(embedding_path, "wb") as f:

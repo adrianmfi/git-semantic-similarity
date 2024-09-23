@@ -1,7 +1,6 @@
 import os
 import re
 import sys
-from typing import List, TypedDict
 
 import click
 import numpy as np
@@ -40,11 +39,6 @@ def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', "_", filename)
 
 
-class Commit(TypedDict):
-    hexsha: str
-    message: str
-
-
 @click.command()
 @click.option(
     "-m",
@@ -78,7 +72,6 @@ def main(query, model, save, save_path, git_args):
     try:
 
         git_args = process_git_args(git_args)
-        print(git_args)
 
         try:
             repo = Repo(".", search_parent_directories=True)
@@ -86,10 +79,7 @@ def main(query, model, save, save_path, git_args):
             click.echo("Not a valid git repository.", err=True)
             sys.exit(1)
 
-        commits: List[Commit] = [
-            {"hexsha": commit.hexsha, "message": commit.message}
-            for commit in repo.iter_commits(**git_args)
-        ]
+        commits = repo.iter_commits(**git_args)
 
         model_instance = load_model(model)
         query_embedding = embed_query(model_instance, query)
@@ -106,7 +96,7 @@ def main(query, model, save, save_path, git_args):
             commit_embedding = embed_commit(model_instance, commit, save, save_path)
             similarity = np.dot(commit_embedding, query_embedding)
             click.echo(
-                f"{similarity}\t{commit['hexsha']} {commit['message'].splitlines()[0]}"
+                f"{similarity}\t{commit.hexsha} {commit.message.splitlines()[0]}"
             )
     except KeyboardInterrupt:
         sys.exit(0)
