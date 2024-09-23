@@ -9,7 +9,13 @@ from git import Commit, Repo
 from git.exc import InvalidGitRepositoryError
 import tqdm
 
-from src.embeddings import EmbeddingsCache, embed_commit, embed_query, load_model
+from src.embeddings import (
+    EmbeddingsCache,
+    embed_commit,
+    embed_commit_batch,
+    embed_query,
+    load_model,
+)
 
 
 class CommitData(TypedDict):
@@ -44,6 +50,12 @@ def process_git_args(remainder):
 
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', "_", filename)
+
+
+def batch(iterable, n=1):
+    l = len(iterable)
+    for ndx in range(0, l, n):
+        yield iterable[ndx : min(ndx + n, l)]
 
 
 @click.command()
@@ -87,9 +99,18 @@ def sanitize_filename(filename):
     default=None,
     help="Limit the number of results displayed.",
 )
+@click.option(
+    "-b",
+    "--batch-size",
+    type=int,
+    default=1000,
+    help="Batch size for embedding commits.",
+)
 @click.argument("query")
 @click.argument("git_args", nargs=-1, type=click.UNPROCESSED)
-def main(query, model, cache, cache_dir, oneline, sort, max_count, git_args):
+def main(
+    query, model, cache, cache_dir, oneline, sort, max_count, batch_size, git_args
+):
     """
     Give a similarity score for each commit based on semantic similarity using an NLP embedding model.
 
@@ -123,13 +144,16 @@ def main(query, model, cache, cache_dir, oneline, sort, max_count, git_args):
 
         commits_to_embed = [c for c in commits if not cache_obj.has_embedding(c.hexsha)]
         if len(commits_to_embed) > 0:
-            for commit in tqdm.tqdm(
-                commits_to_embed,
+            with tqdm.tqdm(
+                total=len(commits_to_embed),  # Set total to the number of commits
                 desc="Processing commits",
                 unit="commit",
-                total=len(commits_to_embed),
-            ):
-                embed_commit(model_instance, commit, cache_obj)
+            ) as pbar:
+                for commit_batch in batch(commits_to_embed, batch_size):
+                    embed_commit_batch(model_instance, commit_batch, cache_obj)
+
+                    # Update the progress bar by the size of the batch
+                    pbar.update(len(commit_batch))
 
         for commit in commits:
             commit_embedding = embed_commit(model_instance, commit, cache_obj)

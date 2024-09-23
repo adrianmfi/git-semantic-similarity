@@ -56,6 +56,19 @@ def embed_commit(model, commit: Commit, cache: EmbeddingsCache | None):
     return embedding
 
 
+def embed_commit_batch(model, commits, cache: EmbeddingsCache | None):
+    if cache is None:
+        return model.encode([commit.message for commit in commits])
+
+    commits_to_embed = [c for c in commits if not cache.has_embedding(c.hexsha)]
+    if len(commits_to_embed) > 0:
+        embeddings = model.encode([commit.message for commit in commits_to_embed])
+        for commit, embedding in zip(commits_to_embed, embeddings):
+            cache.add_embedding(commit.hexsha, embedding)
+
+    return np.array([cache.get_embedding(c.hexsha) for c in commits])
+
+
 def embed_query(model, text: str):
     embeddings = model.encode([text])[0]
     return embeddings
