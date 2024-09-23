@@ -28,7 +28,9 @@ git-semsim "refactoring the user service" -n 50 --author Bob --grep service
 ```
 
 To get the 50 most relevant commits:
-`git-semsim "refactoring the user service" | sort -n -r | head -n 50`
+```bash
+git-semsim "refactoring the user service" | sort -n -r | head -n 50
+```
 
 ## License
 
