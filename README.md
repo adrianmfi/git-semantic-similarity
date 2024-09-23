@@ -17,17 +17,17 @@ pip install .
 In a git repository, run:
 `git-semsim "text to calculate similarity to"`
 
-The tool supports any argument to git rev-list for narrowing results (e.g. filter by author, num resulst)
-For example, to only search the most recent 50 commits by author Bob, where the commit message must contain "service":
-
-Example
-```bash
-git-semsim "refactoring the user service" -n 50 --author Bob --grep service
-```
-
 To get the 50 most relevant commits:
 ```bash
 git-semsim "refactoring the user service" | sort -n -r | head -n 50
+```
+
+The tool supports forwarding arguments to git rev-list (e.g. filter by author, num results)
+For example, to only search the most recent commits for a specific author:
+
+Example
+```bash
+git-semsim "refactoring the user service" -- -n 50 --author Bob
 ```
 
 ## License
