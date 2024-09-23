@@ -1,7 +1,9 @@
 # git-semantic-similarity
 
 ## Summary:
-git-semantic-similarity is a command-line tool for finding git commits by semantic search
+Search git commit messages by semantic similarity with sentence-transformers.
+
+Embeddings are stored on disk for faster retrieval, and can easily be checked into git.
 
 ## Installation
 Clone and run locally
@@ -13,29 +15,34 @@ pip install .
 
 ## Usage
 In a git repository, run:
-`git-semsim "text to calculate similarity to"`
+`git-semsim "query string"`
 
-To get the 10 most relevant commits:
+To only show the 10 most relevant commits:
 ```bash
-git-semsim "refactoring the user service" -n 10
+git-semsim "changes to project documentation" -n 10
 ```
 
-The tool supports forwarding arguments to `git rev-list` (e.g. filter by author, num results)
+To use another pretrained model, for example the current best but slower all-mpnet-base-v2 
+```bash
+git-semsim "user service refactoring" --model all-mpnet-base-v2
+```
+A list of supported models [can be found here](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
+
+The tool supports forwarding arguments to `git rev-list`
 For example, to only search in the 10 most recent commits:
 
-Example
 ```bash
-git-semsim "refactoring the user service" --sort false -- -n 10
+git-semsim "query string" -- -n 10
 ```
 
 Or to filter by a specific author:
 ```
-git-semsim "refactoring the user service" -- --author bob
+git-semsim "query string" -- --author bob
 ```
 
 Or you can format the output in a single line for further shell processing:
 ```bash
-git-semsim "refactoring the user service" --sort False --oneline | sort -n -r | head -n 10
+git-semsim "query string" --sort False --oneline -- n 100 | sort -n -r | head -n 10
 ``` 
 
 ## License
