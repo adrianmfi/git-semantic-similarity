@@ -28,4 +28,6 @@ def embed_commit(model, commit: Commit, save: bool, save_dir: str | None):
 
 
 def load_model(model_name: str):
-    return SentenceTransformer(model_name)
+    return SentenceTransformer(
+        model_name, tokenizer_kwargs={"clean_up_tokenization_spaces": False}
+    )
