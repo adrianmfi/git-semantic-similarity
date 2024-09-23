@@ -68,7 +68,7 @@ def batch(iterable, n=1):
     help="A sentence-transformers model to use for embeddings (for example, a slower but stronger model: sentence-transformers/all-mpnet-base-v2).",
 )
 @click.option(
-    "-s",
+    "-c",
     "--cache",
     type=bool,
     default=True,
