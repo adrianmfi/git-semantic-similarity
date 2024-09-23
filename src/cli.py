@@ -63,9 +63,9 @@ def batch(iterable, n=1):
     "-m",
     "--model",
     type=str,
-    default="sentence-transformers/all-MiniLM-L6-v2",
+    default="sentence-transformers/all-mpnet-base-v2",
     show_default=True,
-    help="A sentence-transformers model to use for embeddings (for example, a slower but stronger model: sentence-transformers/all-mpnet-base-v2).",
+    help="A sentence-transformers model to use for embeddings (for example, a smaller and faster model sentence-transformers/all-MiniLM-L6-v2).",
 )
 @click.option(
     "-c",

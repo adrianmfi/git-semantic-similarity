@@ -22,9 +22,9 @@ To only show the 10 most relevant commits:
 gitsem "changes to project documentation" -n 10
 ```
 
-To use another pretrained model, for example the current best but slower all-mpnet-base-v2 
+To use another pretrained model, for example a smaller and faster model:
 ```bash
-gitsem "user service refactoring" --model all-mpnet-base-v2
+gitsem "user service refactoring" --model sentence-transformers/all-MiniLM-L6-v2
 ```
 A list of supported models [can be found here](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 
@@ -48,7 +48,7 @@ gitsem "query string" --sort False --oneline -- n 100 | sort -n -r | head -n 10
 ## Arguments
 
 - `-m, --model [STRING]`:  
-  A sentence-transformers model to use for embeddings. Default is `sentence-transformers/all-MiniLM-L6-v2`. You can specify a different model for stronger but slower performance, for example, `sentence-transformers/all-mpnet-base-v2`.
+  A sentence-transformers model to use for embeddings. Default is `all-mpnet-base-v2`.
 
 - `-c, --cache [BOOLEAN]`:  
   Whether to cache commit embeddings on disk for faster retrieval. Default is `True`.
