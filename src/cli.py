@@ -1,13 +1,19 @@
 import os
 import re
 import sys
+from typing import List, TypedDict
 
 import click
 import numpy as np
-from git import Repo
+from git import Commit, Repo
 from git.exc import InvalidGitRepositoryError
 
 from src.embeddings import embed_commit, embed_query, load_model
+
+
+class CommitData(TypedDict):
+    commit: Commit
+    similarity: float
 
 
 def process_git_args(remainder):
@@ -61,9 +67,28 @@ def sanitize_filename(filename):
     type=click.Path(),
     help="Path to save embeddings (default: git_root/.git_semsim/model_name).",
 )
+@click.option(
+    "--oneline",
+    is_flag=True,
+    help="Use a concise output format.",
+)
+@click.option(
+    "--sort",
+    type=bool,
+    default=True,
+    show_default=True,
+    help="Sort order for similarity scores.",
+)
+@click.option(
+    "-n",
+    "--max-count",
+    type=int,
+    default=None,
+    help="Limit the number of results displayed.",
+)
 @click.argument("query")
 @click.argument("git_args", nargs=-1, type=click.UNPROCESSED)
-def main(query, model, save, save_path, git_args):
+def main(query, model, save, save_path, oneline, sort, max_count, git_args):
     """
     Give a similarity score for each commit based on semantic similarity using an NLP embedding model.
 
@@ -76,7 +101,7 @@ def main(query, model, save, save_path, git_args):
         try:
             repo = Repo(".", search_parent_directories=True)
         except InvalidGitRepositoryError:
-            click.echo("Not a valid git repository.", err=True)
+            click.echo("Error: Not a valid git repository.", err=True)
             sys.exit(1)
 
         commits = repo.iter_commits(**git_args)
@@ -92,15 +117,44 @@ def main(query, model, save, save_path, git_args):
         if save:
             os.makedirs(save_path, exist_ok=True)
 
+        results: List[CommitData] = []
+
         for commit in commits:
             commit_embedding = embed_commit(model_instance, commit, save, save_path)
-            similarity = np.dot(commit_embedding, query_embedding)
-            click.echo(
-                f"{similarity}\t{commit.hexsha} {commit.message.splitlines()[0]}"
-            )
+            similarity = float(np.dot(commit_embedding, query_embedding))
+            results.append({"commit": commit, "similarity": similarity})
+
+        # Sort results
+        if sort:
+            results.sort(key=lambda x: x["similarity"], reverse=True)
+
+        if max_count:
+            results = results[:max_count]
+
+        # Prepare output
+        output_lines = []
+        for data in results:
+            commit = data["commit"]
+            similarity = data["similarity"]
+            if oneline:
+                line = f"{similarity:.4f}\t{commit.hexsha} {commit.summary}"
+            else:
+                line = (
+                    f"Commit: {click.style(commit.hexsha, fg='yellow')}\n"
+                    f"Author: {commit.author.name} <{commit.author.email}>\n"
+                    f"Date:   {commit.authored_datetime.strftime('%Y-%m-%d %H:%M:%S')}\n"
+                    f"Similarity: {similarity:.4f}\n\n"
+                    f"    {commit.message.strip()}\n"
+                    f"{'-'*72}\n"
+                )
+            output_lines.append(line)
+
+        output = "\n".join(output_lines)
+
+        click.echo_via_pager(output)
+
     except KeyboardInterrupt:
         sys.exit(0)
-
-
-if __name__ == "__main__":
-    main()
+    except Exception as e:
+        click.echo(f"Error: {str(e)}", err=True)
+        sys.exit(1)
