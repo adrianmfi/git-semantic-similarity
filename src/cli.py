@@ -176,12 +176,11 @@ def main(
                 line = f"{similarity:.4f}\t{commit.hexsha} {commit.summary}"
             else:
                 line = (
-                    f"Commit: {click.style(commit.hexsha, fg='yellow')}\n"
+                    f"Commit {click.style(commit.hexsha, fg='yellow')}\n"
                     f"Author: {commit.author.name} <{commit.author.email}>\n"
-                    f"Date:   {commit.authored_datetime.strftime('%Y-%m-%d %H:%M:%S')}\n"
+                    f"Date:   {commit.authored_datetime}\n"
                     f"Similarity: {similarity:.4f}\n\n"
                     f"    {commit.message.strip()}\n"
-                    f"{'-'*72}\n"
                 )
             output_lines.append(line)
 
