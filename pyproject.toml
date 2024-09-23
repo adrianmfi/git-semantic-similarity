@@ -22,4 +22,4 @@ dependencies = [
 file = "LICENSE"
 
 [project.scripts]
-git-semsim = "src.cli:main"
+gitsem = "src.cli:main"
