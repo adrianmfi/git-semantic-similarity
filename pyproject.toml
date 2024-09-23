@@ -13,7 +13,6 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "InstructorEmbedding==1.0.1",
     "sentence_transformers>=2.2.0",
     "GitPython>=3.1.40",
     "numpy",
@@ -23,4 +22,4 @@ dependencies = [
 file = "LICENSE"
 
 [project.scripts]
-git-semsim = "cli:main"
+git-semsim = "src.cli:main"

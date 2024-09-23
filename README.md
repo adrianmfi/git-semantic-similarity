@@ -1,11 +1,9 @@
 # git-semantic-similarity
 
 ## Summary:
-git-semantic-similarity is a command-line tool leveraging NLP models to search for commits by commit message with semantic similarity. All computations are done locally.
+git-semantic-similarity is a command-line tool for finding git commits by semantic search
 
-## How It Works
-On first use, the tool downloads the Instructor embedding model. Similarity is computed by embedding the search term and commit messages into vectors, and taking the cosine distance between them.
-By default, the tool caches the embeddings of commit messages for faster subsequent search.
+## Examples
 
 ## Installation
 Clone and run locally

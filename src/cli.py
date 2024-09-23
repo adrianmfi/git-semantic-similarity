@@ -7,8 +7,8 @@ from typing import List, TypedDict
 import numpy as np
 from git import Repo
 from git.exc import InvalidGitRepositoryError
-from InstructorEmbedding import INSTRUCTOR
 
+from src.embeddings import embed_commit, embed_query, load_model
 
 def parse_git_args(remainder):
     git_args = {}
@@ -45,31 +45,6 @@ class Commit(TypedDict):
     message: str
 
 
-def embed_query(instructor_model, text: str):
-    instruction = "Represent the search term for retrieval of git commit messages"
-    embeddings = instructor_model.encode([[instruction, text]])[0]
-    return embeddings
-
-
-def embed_commit(instructor_model, commit: Commit, save: bool, save_dir: str):
-    embedding_path = os.path.join(save_dir, str(commit['hexsha']))
-    try:
-        with open(embedding_path, 'rb') as f:
-            return np.load(f)
-    except IOError:
-        # missing embedding
-        pass
-
-    instruction = "Represent the commit message for retrieval"
-    embeddings = instructor_model.encode([[instruction, commit['message']]])[0]
-
-    if save:
-        with open(embedding_path, 'wb') as f:
-            np.save(f, embeddings)
-
-    return embeddings
-
-
 def main():
     try:
         parser = argparse.ArgumentParser(
@@ -78,8 +53,8 @@ def main():
 
         parser.add_argument(
             '-m', '--model',
-            choices=['hkunlp/instructor-xl', "hkunlp/instructor-large"],
-            default='hkunlp/instructor-xl',
+            choices=['sentence-transformers/all-MiniLM-L6-v2'],
+            default='sentence-transformers/all-MiniLM-L6-v2',
             help="Model to use")
 
         parser.add_argument(
@@ -108,8 +83,8 @@ def main():
         commits: List[Commit] = [{'hexsha': commit.hexsha, 'message': commit.message}
                                  for commit in repo.iter_commits(**git_args)]
 
-        instructor_model = INSTRUCTOR(args.model)
-        query_embedding = embed_query(instructor_model, args.query)
+        model = load_model('sentence-transformers/all-MiniLM-L6-v2')
+        query_embedding = embed_query(model, args.query)
 
         save_path = args.save_path
         if not save_path:
@@ -120,7 +95,7 @@ def main():
 
         for commit in commits:
             commit_embedding = embed_commit(
-                instructor_model, commit,  args.save, save_path)
+                model, commit,  args.save, save_path)
             similarity = np.dot(commit_embedding, query_embedding)
             print(str(similarity) + "\t"+commit['hexsha'] +
                   " "+commit['message'].splitlines()[0])
