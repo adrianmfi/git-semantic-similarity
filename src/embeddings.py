@@ -31,8 +31,7 @@ class EmbeddingsCache:
 
     def add_embedding(self, commit_hash: str, embedding: np.ndarray):
         """Add a new embedding to the cache and append it to the cache file."""
-        rounded_embedding = np.round(embedding, decimals=3)
-        self.embeddings[commit_hash] = rounded_embedding
+        self.embeddings[commit_hash] = embedding
         data = {
             "commit_hash": commit_hash,
             "embedding": embedding.tolist(),
