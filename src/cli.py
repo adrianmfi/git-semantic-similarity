@@ -7,6 +7,7 @@ import click
 import numpy as np
 from git import Commit, Repo
 from git.exc import InvalidGitRepositoryError
+import tqdm
 
 from src.embeddings import EmbeddingsCache, embed_commit, embed_query, load_model
 
@@ -49,7 +50,7 @@ def sanitize_filename(filename):
 @click.option(
     "-m",
     "--model",
-    type=click.Choice(["sentence-transformers/all-MiniLM-L6-v2"]),
+    type=str,
     default="sentence-transformers/all-MiniLM-L6-v2",
     show_default=True,
     help="A sentence-transformers model to use for embeddings.",
@@ -104,7 +105,7 @@ def main(query, model, cache, cache_dir, oneline, sort, max_count, git_args):
             click.echo("Error: Not a valid git repository.", err=True)
             sys.exit(1)
 
-        commits = repo.iter_commits(**git_args)
+        commits = list(repo.iter_commits(**git_args))
 
         model_instance = load_model(model)
         query_embedding = embed_query(model_instance, query)
@@ -119,6 +120,16 @@ def main(query, model, cache, cache_dir, oneline, sort, max_count, git_args):
             cache_obj = EmbeddingsCache(cache_dir)
 
         results: List[CommitData] = []
+
+        commits_to_embed = [c for c in commits if not cache_obj.has_embedding(c.hexsha)]
+        if len(commits_to_embed) > 0:
+            for commit in tqdm.tqdm(
+                commits_to_embed,
+                desc="Processing commits",
+                unit="commit",
+                total=len(commits_to_embed),
+            ):
+                embed_commit(model_instance, commit, cache_obj)
 
         for commit in commits:
             commit_embedding = embed_commit(model_instance, commit, cache_obj)

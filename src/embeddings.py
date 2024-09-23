@@ -40,6 +40,9 @@ class EmbeddingsCache:
         with open(self.embeddings_file, "a", encoding="utf-8") as f:
             f.write(json.dumps(data) + "\n")
 
+    def has_embedding(self, commit_hash: str) -> bool:
+        return commit_hash in self.embeddings
+
 
 def embed_commit(model, commit: Commit, cache: EmbeddingsCache | None):
     if cache is None:
