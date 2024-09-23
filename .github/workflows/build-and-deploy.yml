@@ -34,4 +34,4 @@ jobs:
       - name: Build package
         run: python -m build
       - name: Publish package
-        uses: pypa/gh-action-pypi-publish@1.10.2
+        uses: pypa/gh-action-pypi-publish@release/v1
