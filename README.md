@@ -35,9 +35,7 @@ Similarity: -0.0716
 ## Installation
 Clone and run locally
 ```bash
-git clone https://github.com/adrianmfi/git-semantic-similarity.git
-cd git-semantic-similarity
-pip install .
+pip install git-semantic-similarity
 ```
 
 ## Usage
