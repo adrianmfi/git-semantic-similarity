@@ -1,12 +1,13 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "git-semantic-similarity"
 version = "1.0.3"
-description = "file: README.md"
+description = "Search git commit messages by semantic similarity with embeddings from sentence-transformers."
 readme = "README.md"
+requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -17,9 +18,14 @@ dependencies = [
     "GitPython==3.1.43",
     "numpy==2.1.0",
     "click==8.1.7",
+    "tqdm==4.66.5"
 ]
 [project.license]
 file = "LICENSE"
 
 [project.scripts]
 gitsem = "src.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src"]
