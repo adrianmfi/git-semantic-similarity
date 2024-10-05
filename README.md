@@ -33,9 +33,10 @@ Similarity: -0.0716
 ```
 
 ## Installation
-Clone and run locally
+First, install [pipx](https://github.com/pypa/pipx).
+Then, install with pipx:
 ```bash
-pip install git-semantic-similarity
+pipx install git-semantic-similarity
 ```
 
 ## Usage
