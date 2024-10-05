@@ -135,7 +135,7 @@ def main(
         if cache:
             if not cache_dir:
                 cache_dir = os.path.join(
-                    repo.working_tree_dir, ".git_semsim", sanitize_filename(model)
+                    repo.working_tree_dir, ".gitsem", sanitize_filename(model)
                 )
             os.makedirs(cache_dir, exist_ok=True)
             cache_obj = EmbeddingsCache(cache_dir)
