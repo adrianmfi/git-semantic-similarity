@@ -9,14 +9,6 @@ from git import Commit, Repo
 from git.exc import InvalidGitRepositoryError
 import tqdm
 
-from src.embeddings import (
-    EmbeddingsCache,
-    embed_commit,
-    embed_commit_batch,
-    embed_query,
-    load_model,
-)
-
 
 class CommitData(TypedDict):
     commit: Commit
@@ -127,6 +119,14 @@ def main(
             sys.exit(1)
 
         commits = list(repo.iter_commits(**git_args))
+
+        from src.embeddings import (
+            EmbeddingsCache,
+            embed_commit,
+            embed_commit_batch,
+            embed_query,
+            load_model,
+        )
 
         model_instance = load_model(model)
         query_embedding = embed_query(model_instance, query)
