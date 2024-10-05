@@ -4,6 +4,8 @@ from git import Commit
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
+msg_prefix = "commit message:\n"
+
 
 class EmbeddingsCache:
     def __init__(self, cache_dir: str):
@@ -45,24 +47,26 @@ class EmbeddingsCache:
 
 def embed_commit(model, commit: Commit, cache: EmbeddingsCache | None):
     if cache is None:
-        return model.encode([commit.message])[0]
+        return model.encode([msg_prefix + commit.message])[0]
 
     commit_hash = str(commit.hexsha)
     embedding = cache.get_embedding(commit_hash)
     if embedding is not None:
         return embedding
-    embedding = model.encode([commit.message])[0]
+    embedding = model.encode([msg_prefix + commit.message])[0]
     cache.add_embedding(commit_hash, embedding)
     return embedding
 
 
 def embed_commit_batch(model, commits, cache: EmbeddingsCache | None):
     if cache is None:
-        return model.encode([commit.message for commit in commits])
+        return model.encode([msg_prefix + commit.message for commit in commits])
 
     commits_to_embed = [c for c in commits if not cache.has_embedding(c.hexsha)]
     if len(commits_to_embed) > 0:
-        embeddings = model.encode([commit.message for commit in commits_to_embed])
+        embeddings = model.encode(
+            [msg_prefix + commit.message for commit in commits_to_embed]
+        )
         for commit, embedding in zip(commits_to_embed, embeddings):
             cache.add_embedding(commit.hexsha, embedding)
 
