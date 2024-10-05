@@ -1,6 +1,6 @@
 # git-semantic-similarity
 
-Search git commit messages by semantic similarity with sentence-transformers.
+Search git commit messages by semantic similarity with embeddings from [sentence-transformers](https://github.com/UKPLab/sentence-transformers).
 
 Embeddings are stored on disk for faster retrieval, and can easily be checked into git.
 
