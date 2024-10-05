@@ -9,6 +9,8 @@ from git import Commit, Repo
 from git.exc import InvalidGitRepositoryError
 import tqdm
 
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 
 class CommitData(TypedDict):
     commit: Commit
@@ -104,7 +106,7 @@ def main(
     query, model, cache, cache_dir, oneline, sort, max_count, batch_size, git_args
 ):
     """
-    Give a similarity score for each commit based on semantic similarity using an NLP embedding model.
+    Give a similarity score for each commit based on semantic similarity from a sentence-transformers model.
 
     QUERY is the search string to compare with.
     """
