@@ -122,7 +122,6 @@ def main(
 
         from src.embeddings import (
             EmbeddingsCache,
-            embed_commit,
             embed_commit_batch,
             embed_query,
             load_model,
@@ -132,6 +131,7 @@ def main(
         query_embedding = embed_query(model_instance, query)
 
         # Determine the save path
+        cache_obj = None
         if cache:
             if not cache_dir:
                 cache_dir = os.path.join(
@@ -140,25 +140,29 @@ def main(
             os.makedirs(cache_dir, exist_ok=True)
             cache_obj = EmbeddingsCache(cache_dir)
 
+        enable_tqdm = not cache or any(
+            not cache_obj.has_embedding(commit.hexsha) for commit in commits
+        )
+
         results: List[CommitData] = []
+        with tqdm.tqdm(
+            total=len(commits),
+            desc="Processing commits",
+            unit="commit",
+            disable=not enable_tqdm,
+        ) as pbar:
+            for commit_batch in batch(commits, batch_size):
+                commit_batch_embeddings = embed_commit_batch(
+                    model_instance, commit_batch, cache_obj
+                )
 
-        commits_to_embed = [c for c in commits if not cache_obj.has_embedding(c.hexsha)]
-        if len(commits_to_embed) > 0:
-            with tqdm.tqdm(
-                total=len(commits_to_embed),  # Set total to the number of commits
-                desc="Processing commits",
-                unit="commit",
-            ) as pbar:
-                for commit_batch in batch(commits_to_embed, batch_size):
-                    embed_commit_batch(model_instance, commit_batch, cache_obj)
+                for commit, commit_embedding in zip(
+                    commit_batch, commit_batch_embeddings
+                ):
+                    similarity = float(np.dot(commit_embedding, query_embedding))
+                    results.append({"commit": commit, "similarity": similarity})
 
-                    # Update the progress bar by the size of the batch
-                    pbar.update(len(commit_batch))
-
-        for commit in commits:
-            commit_embedding = embed_commit(model_instance, commit, cache_obj)
-            similarity = float(np.dot(commit_embedding, query_embedding))
-            results.append({"commit": commit, "similarity": similarity})
+                pbar.update(len(commit_batch))
 
         # Sort results
         if sort:
