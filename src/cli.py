@@ -95,7 +95,7 @@ def batch(iterable, n=1):
     "-b",
     "--batch-size",
     type=int,
-    default=1000,
+    default=100,
     help="Batch size for embedding commits.",
 )
 @click.argument("query")
