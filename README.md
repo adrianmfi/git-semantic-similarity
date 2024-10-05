@@ -92,7 +92,7 @@ gitsem "query string" --sort False --oneline -- n 100 | sort -n -r | head -n 10
   Limit the number of results displayed. If not provided, no limit is applied.
 
 - `-b, --batch-size [INTEGER]`:  
-  Batch size for embedding commits. Default is `1000`.
+  Batch size for embedding commits. Default is `100`.
 
 - `query [STRING]`:  
   The query string to compare against commit messages.
