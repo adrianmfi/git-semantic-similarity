@@ -9,14 +9,14 @@ Embeddings are stored on disk for faster retrieval, and can easily be checked in
 $ gitsem "project scaffolding"
 
 Commit 403836d2ee4900579b0d1e8169dd4bfebddab0ba
-Author: Adrian Meidell Fiorito <adrianmefi@gmail.com>
+Author: Foo Bar <foo@barcom>
 Date:   2024-09-23 19:08:05
 Similarity: 0.2299
 
     Change model, add src folder
 
 Commit d2909a8ec352a881ab05cab8b8a67038b063f37a
-Author: Adrian Meidell Fiorito <adrianmefi@gmail.com>
+Author: Foo Bar <foo@barcom>
 Date:   2024-09-23 19:08:05
 Similarity: 0.2086
 
@@ -25,7 +25,7 @@ Similarity: 0.2086
 ...
 
 Commit a09923166072aca4910e92272ef161e3398b1d89
-Author: Adrian Meidell Fiorito <adrianmefi@gmail.com>
+Author: Foo Bar <foo@barcom>
 Date:   2024-09-23 19:08:05
 Similarity: -0.0716
 
