@@ -80,7 +80,7 @@ gitsem "query string" --sort False --oneline -- n 100 | sort -n -r | head -n 10
   Whether to cache commit embeddings on disk for faster retrieval. Default is `True`.
 
 - `--cache-dir [PATH]`:  
-  Directory to store cached embeddings. If not specified, defaults to `git_root/.git_semsim/model_name`.
+  Directory to store cached embeddings. If not specified, defaults to `git_root/.gitsem/model_name`.
 
 - `--oneline`:  
   Use a concise output format.
