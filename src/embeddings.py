@@ -1,3 +1,4 @@
+from base64 import b64decode, b64encode
 import json
 import os
 from git import Commit
@@ -25,7 +26,13 @@ class EmbeddingsCache:
                 data = json.loads(line)
                 commit_hash = data["commit_hash"]
                 if commit_hash not in self.embeddings:
-                    self.embeddings[commit_hash] = np.array(data["embedding"])
+                    version = data.get("version", 1)
+                    if version == 1:
+                        self.embeddings[commit_hash] = np.array(data["embedding"])
+                    elif version == 2:
+                        self.embeddings[commit_hash] = np.frombuffer(
+                            b64decode(data["embedding"]), dtype=np.float16
+                        )
 
     def get_embedding(self, commit_hash: str):
         """Retrieve an embedding from the cache."""
@@ -36,7 +43,10 @@ class EmbeddingsCache:
         self.embeddings[commit_hash] = embedding
         data = {
             "commit_hash": commit_hash,
-            "embedding": embedding.tolist(),
+            "embedding": b64encode(embedding.astype(np.float16).tobytes()).decode(
+                "utf-8"
+            ),
+            "version": 2,
         }
         with open(self.embeddings_file, "a", encoding="utf-8") as f:
             f.write(json.dumps(data) + "\n")
