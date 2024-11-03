@@ -18,7 +18,7 @@ dependencies = [
     "GitPython==3.1.43",
     "numpy==2.1.0",
     "click==8.1.7",
-    "tqdm==4.66.5"
+    "tqdm==4.66.6"
 ]
 [project.license]
 file = "LICENSE"
