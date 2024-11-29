@@ -2,7 +2,7 @@
 
 Search git commit messages by semantic similarity with embeddings from [sentence-transformers](https://github.com/UKPLab/sentence-transformers).
 
-Embeddings are stored on disk for faster retrieval, and can easily be checked into git.
+Embeddings are generated locally, can be stored on disk for faster reuse, and can be checked into git for sharing embeddings with other users.
 
 
 ```
