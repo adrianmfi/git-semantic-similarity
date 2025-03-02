@@ -88,8 +88,6 @@ def embed_query(model, text: str):
     return embeddings
 
 
-def load_model(model_name: str):
-    return SentenceTransformer(
-        model_name,
-        tokenizer_kwargs={"clean_up_tokenization_spaces": False},
-    )
+def load_model(model_name: str, **kwargs):
+    tokenizer_kwargs = {"clean_up_tokenization_spaces": False}
+    return SentenceTransformer(model_name, tokenizer_kwargs=tokenizer_kwargs, **kwargs)

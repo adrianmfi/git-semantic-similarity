@@ -76,6 +76,9 @@ gitsem "query string" --sort False --oneline -- n 100 | sort -n -r | head -n 10
 - `-m, --model [STRING]`:  
   A sentence-transformers model to use for embeddings. Default is `all-mpnet-base-v2`.
 
+- `--model-args [STRING]`:  
+  Additional arguments for SentenceTransformers model initialization in format: `key1=value1,key2=value2`. For example: `truncate_dim=256,trust_remote_code=true`
+
 - `-c, --cache [BOOLEAN]`:  
   Whether to cache commit embeddings on disk for faster retrieval. Default is `True`.
 

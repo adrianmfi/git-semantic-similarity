@@ -52,6 +52,28 @@ def batch(iterable, n=1):
         yield iterable[ndx : min(ndx + n, l)]
 
 
+def parse_model_args(args_str: str) -> dict:
+    if not args_str:
+        return {}
+
+    result = {}
+    try:
+        # Parse "key1=value1,key2=value2" format
+        pairs = args_str.split(",")
+        for pair in pairs:
+            key, value = pair.split("=")
+            # Try to convert to appropriate type
+            try:
+                value = eval(value)  # safely convert numbers and bools
+            except:
+                pass  # keep as string if eval fails
+            result[key] = value
+    except Exception as e:
+        click.echo(f"Error parsing model arguments: {str(e)}", err=True)
+        sys.exit(1)
+    return result
+
+
 @click.command()
 @click.option(
     "-m",
@@ -60,6 +82,12 @@ def batch(iterable, n=1):
     default="sentence-transformers/all-mpnet-base-v2",
     show_default=True,
     help="A sentence-transformers model to use for embeddings (for example, a smaller and faster model sentence-transformers/all-MiniLM-L6-v2).",
+)
+@click.option(
+    "--model-args",
+    type=str,
+    default="",
+    help="Additional arguments for model initialization in format: key1=value1,key2=value2",
 )
 @click.option(
     "-c",
@@ -103,7 +131,16 @@ def batch(iterable, n=1):
 @click.argument("query")
 @click.argument("git_args", nargs=-1, type=click.UNPROCESSED)
 def main(
-    query, model, cache, cache_dir, oneline, sort, max_count, batch_size, git_args
+    query,
+    model,
+    model_args,
+    cache,
+    cache_dir,
+    oneline,
+    sort,
+    max_count,
+    batch_size,
+    git_args,
 ):
     """
     Give a similarity score for each commit based on semantic similarity from a sentence-transformers model.
@@ -129,7 +166,8 @@ def main(
             load_model,
         )
 
-        model_instance = load_model(model)
+        model_kwargs = parse_model_args(model_args)
+        model_instance = load_model(model, **model_kwargs)
         query_embedding = embed_query(model_instance, query)
 
         # Determine the save path
