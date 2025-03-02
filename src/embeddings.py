@@ -84,11 +84,12 @@ def embed_commit_batch(model, commits, cache: EmbeddingsCache | None):
 
 
 def embed_query(model, text: str):
-    embeddings = model.encode([text])[0]
+    embeddings = model.encode([text])
     return embeddings
 
 
 def load_model(model_name: str):
     return SentenceTransformer(
-        model_name, tokenizer_kwargs={"clean_up_tokenization_spaces": False}
+        model_name,
+        tokenizer_kwargs={"clean_up_tokenization_spaces": False},
     )

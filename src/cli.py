@@ -161,7 +161,12 @@ def main(
                 for commit, commit_embedding in zip(
                     commit_batch, commit_batch_embeddings
                 ):
-                    similarity = float(np.dot(commit_embedding, query_embedding))
+                    # Convert cached embedding to float32
+                    commit_embedding = commit_embedding.astype(np.float32)
+                    similarity = model_instance.similarity(
+                        commit_embedding, query_embedding[0]
+                    )
+                    similarity = float(similarity)
                     results.append({"commit": commit, "similarity": similarity})
 
                 pbar.update(len(commit_batch))
