@@ -4,7 +4,6 @@ Search git commit messages by semantic similarity with embeddings from [sentence
 
 Embeddings are generated locally, can be stored on disk for faster reuse, and can be checked into git for sharing embeddings with other users.
 
-
 ```
 $ gitsem "project scaffolding"
 
@@ -33,25 +32,42 @@ Similarity: -0.0716
 ```
 
 ## Installation
-First, install [pipx](https://github.com/pypa/pipx).
+
+### Using pipx
+
+Install [pipx](https://github.com/pypa/pipx).
 Then, install with pipx:
+
 ```bash
 pipx install git-semantic-similarity
 ```
 
+### Using uv
+
+Install [uv](https://github.com/astral-sh/uv).
+Then, install with uv:
+
+```bash
+uv tool install git-semantic-similarity
+```
+
 ## Usage
+
 In a git repository, run:
 `gitsem "query string"`
 
 To only show the 10 most relevant commits:
+
 ```bash
 gitsem "changes to project documentation" -n 10
 ```
 
 To use another pretrained model, for example a smaller and faster model:
+
 ```bash
 gitsem "user service refactoring" --model sentence-transformers/all-MiniLM-L6-v2
 ```
+
 A list of supported models [can be found here](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 
 The tool supports forwarding arguments to `git rev-list`
@@ -62,14 +78,16 @@ gitsem "query string" -- -n 10
 ```
 
 Or to filter by a specific author:
+
 ```
 gitsem "query string" -- --author bob
 ```
 
 Or you can format the output in a single line for further shell processing:
+
 ```bash
 gitsem "query string" --sort False --oneline -- n 100 | sort -n -r | head -n 10
-``` 
+```
 
 ## Arguments
 
@@ -102,7 +120,6 @@ gitsem "query string" --sort False --oneline -- n 100 | sort -n -r | head -n 10
 
 - `git_args [STRING...]`:  
   Arguments after `--` will be forwarded to `git rev-list`.
-
 
 ## License
 
