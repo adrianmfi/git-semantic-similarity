@@ -14,11 +14,11 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "sentence_transformers==3.4.1",
-    "GitPython==3.1.44",
+    "sentence_transformers==5.1.2",
+    "GitPython==3.1.46",
     "numpy==2.2.3",
     "click==8.1.8",
-    "tqdm==4.67.1"
+    "tqdm==4.67.2"
 ]
 [project.license]
 file = "LICENSE"
